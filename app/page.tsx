@@ -24,6 +24,7 @@ import dynamic from "next/dynamic"
 import { BlockchainProject, calculateEstimatedCO2, formatTimestamp } from "@/lib/blockchain"
 import { BlockchainVerification, AuditTrail } from "@/components/blockchain-verification"
 import { WalletStatus } from "@/components/wallet-connection"
+import { PlantationChart } from "@/components/plantation-chart"
 
 const InteractiveMap = dynamic(() => import("@/components/interactive-map"), {
   ssr: false,
@@ -45,6 +46,9 @@ const projectsData = {
       state: "West Bengal",
       implementing_body: "Sundarbans Coastal Panchayat",
       credits_issued: 1500,
+      area_hectares: 150,
+      start_date: "2024-01-15",
+      project_type: "Mangrove Afforestation",
       geometry: { type: "Point", coordinates: [88.85, 21.95] },
       audit_trail: [
         {
@@ -108,7 +112,16 @@ const projectsData = {
       state: "Tamil Nadu",
       implementing_body: "Cuddalore Coastal Panchayat",
       credits_issued: 850,
+      area_hectares: 85,
+      start_date: "2024-02-01",
+      project_type: "Mangrove Restoration",
       geometry: { type: "Point", coordinates: [79.79, 11.49] },
+      plantation_timeline: [
+        { month: "Jan 2024", saplings_planted: 3000 },
+        { month: "Feb 2024", saplings_planted: 7500 },
+        { month: "Mar 2024", saplings_planted: 12000 },
+        { month: "Apr 2024", saplings_planted: 15000 },
+      ],
     },
     {
       id: "proj003",
@@ -116,7 +129,17 @@ const projectsData = {
       state: "Gujarat",
       implementing_body: "Kutch District Panchayat",
       credits_issued: 2200,
+      area_hectares: 220,
+      start_date: "2024-01-20",
+      project_type: "Coastal Restoration",
       geometry: { type: "Point", coordinates: [69.85, 23.01] },
+      plantation_timeline: [
+        { month: "Jan 2024", saplings_planted: 8000 },
+        { month: "Feb 2024", saplings_planted: 15000 },
+        { month: "Mar 2024", saplings_planted: 25000 },
+        { month: "Apr 2024", saplings_planted: 35000 },
+        { month: "May 2024", saplings_planted: 45000 },
+      ],
     },
     {
       id: "proj004",
@@ -124,6 +147,9 @@ const projectsData = {
       state: "Kerala",
       implementing_body: "Kuttanad Development Agency",
       credits_issued: 1850,
+      area_hectares: 185,
+      start_date: "2024-02-10",
+      project_type: "Mangrove Conservation",
       geometry: { type: "Point", coordinates: [76.43, 9.6] },
       audit_trail: [
         {
@@ -1115,66 +1141,7 @@ function ProjectDetailView({ projectId, onBack }: { projectId: string; onBack: (
             <p className="text-sm text-gray-600">Monthly sapling plantation progress</p>
           </CardHeader>
           <CardContent>
-            <div className="h-64 relative">
-              <canvas id="plantationGrowthChart" className="w-full h-full"></canvas>
-            </div>
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `
-                document.addEventListener('DOMContentLoaded', function() {
-                  const ctx = document.getElementById('plantationGrowthChart');
-                  if (ctx && window.Chart) {
-                    new Chart(ctx, {
-                      type: 'bar',
-                      data: {
-                        labels: ['Jan 2024', 'Feb 2024', 'Mar 2024'],
-                        datasets: [{
-                          label: 'Saplings Planted',
-                          data: [${projectDetail.plantation_timeline.map((item) => item.saplings_planted).join(", ")}],
-                          backgroundColor: 'rgba(22, 163, 74, 0.6)',
-                          borderColor: 'rgba(22, 163, 74, 1)',
-                          borderWidth: 1,
-                          borderRadius: 5
-                        }]
-                      },
-                      options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                          legend: {
-                            display: false
-                          },
-                          tooltip: {
-                            callbacks: {
-                              label: function(context) {
-                                return context.parsed.y.toLocaleString() + ' saplings';
-                              }
-                            }
-                          }
-                        },
-                        scales: {
-                          y: {
-                            beginAtZero: true,
-                            title: {
-                              display: true,
-                              text: 'Number of Saplings Planted'
-                            }
-                          },
-                          x: {
-                            title: {
-                              display: true,
-                              text: 'Month'
-                            }
-                          }
-                        }
-                      }
-                    });
-                  }
-                });
-              `,
-              }}
-            />
+            <PlantationChart data={projectDetail.plantation_timeline} />
           </CardContent>
         </Card>
       )}
